@@ -1,0 +1,81 @@
+.vehicle-detections {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.vehicle-detections.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  color: #999;
+  font-size: 1.1em;
+}
+
+.vehicle-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.vehicle-plate {
+  background: linear-gradient(135deg, #1a1a1a 0%, #444 100%);
+  color: #ffd700;
+  padding: 15px;
+  font-size: 1.8em;
+  font-weight: 700;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  border-bottom: 3px solid #ffd700;
+}
+
+.vehicle-details {
+  padding: 15px;
+  color: white;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.value {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+@media (max-width: 768px) {
+  .vehicle-detections {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .vehicle-plate {
+    font-size: 1.3em;
+    padding: 12px;
+  }
+
+  .vehicle-details {
+    padding: 12px;
+  }
+}

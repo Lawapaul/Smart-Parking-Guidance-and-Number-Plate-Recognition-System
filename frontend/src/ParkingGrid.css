@@ -1,0 +1,88 @@
+.parking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  min-height: 200px;
+}
+
+.parking-grid.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 1.1em;
+}
+
+.parking-slot {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+}
+
+.parking-slot.available {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border-color: #27ae60;
+}
+
+.parking-slot.occupied {
+  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  border-color: #e74c3c;
+  opacity: 0.8;
+}
+
+.parking-slot.recommended {
+  border-color: #f1c40f;
+  box-shadow: 0 0 0 3px rgba(241, 196, 15, 0.28), 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.parking-slot:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.parking-slot:active {
+  transform: translateY(-2px);
+}
+
+.slot-label {
+  font-size: 1.3em;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.slot-status {
+  font-size: 0.95em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.slot-coordinates {
+  font-size: 0.75em;
+  opacity: 0.8;
+  font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 768px) {
+  .parking-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .parking-slot {
+    padding: 12px;
+  }
+
+  .slot-label {
+    font-size: 1.1em;
+  }
+
+  .slot-coordinates {
+    font-size: 0.65em;
+  }
+}
