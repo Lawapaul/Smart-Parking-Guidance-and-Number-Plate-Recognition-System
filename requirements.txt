@@ -1,0 +1,11 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+sqlalchemy==2.0.36
+pydantic==2.10.3
+opencv-python-headless==4.13.0.92
+numpy==2.4.4
+ultralytics==8.1.0
+easyocr==1.7.0
+pillow==10.2.0
+python-multipart==0.0.7
+requests==2.32.3

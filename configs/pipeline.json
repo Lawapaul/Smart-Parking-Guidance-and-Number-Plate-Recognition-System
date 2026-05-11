@@ -1,0 +1,14 @@
+{
+  "project": {
+    "name": "Smart Parking System",
+    "version": "2.0.0"
+  },
+  "demo": {
+    "use_stub_vehicle": true,
+    "notes": "The default CLI demo performs real parking-slot analysis and inserts a lightweight demo vehicle record for fast, low-resource runs."
+  },
+  "api": {
+    "host": "0.0.0.0",
+    "port": 8000
+  }
+}

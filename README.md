@@ -1,330 +1,226 @@
-# Smart Parking System - Complete Implementation
+# Smart Parking System
 
-A real-time parking detection and vehicle plate recognition system with FastAPI backend and React frontend.
+A clean, GitHub-ready machine vision project for parking-slot occupancy detection, vehicle tracking, and license-plate-aware parking guidance.
 
-## 🎯 Overview
+## Problem Statement
 
-This system provides:
-- **Real-time Parking Slot Detection**: Detects empty/occupied parking slots using ML classifier
-- **License Plate Recognition**: Identifies and extracts vehicle license plate numbers
-- **Live Dashboard**: Beautiful web interface showing parking status and detected vehicles
-- **REST API**: Comprehensive API for data access and system monitoring
-- **Direction Visualization**: Displays parking layout using mask-based visualization
+Finding an open parking slot quickly is frustrating in crowded lots, and operators often have limited visibility into slot occupancy and recent vehicle movement. This project demonstrates how computer vision can convert video feeds and layout masks into actionable parking availability data and vehicle records.
 
-## 📁 Project Structure
+## Solution Overview
 
-```
-Machine Vision Project/
-├── backend/                          # FastAPI backend
-│   ├── main.py                       # FastAPI application entry point
-│   ├── models.py                     # SQLAlchemy ORM models
-│   ├── database.py                   # Database configuration
-│   ├── requirements.txt              # Python dependencies
-│   ├── services/
-│   │   ├── data_manager.py          # Thread-safe data access
-│   │   ├── parking_detector.py      # Parking detection service
-│   │   └── plate_detector.py        # Plate detection service
-│   └── routes/
-│       └── parking.py               # REST API endpoints
-│
-├── frontend/                         # React dashboard
-│   ├── public/
-│   │   └── index.html               # HTML entry point
-│   ├── src/
-│   │   ├── index.js                 # React entry point
-│   │   ├── App.js                   # Main App component
-│   │   ├── Dashboard.js             # Dashboard component
-│   │   ├── ParkingGrid.js           # Slot grid display
-│   │   ├── VehicleDetections.js     # Vehicle list
-│   │   └── components/
-│   │       └── MaskVisualization.js # Parking layout visualization
-│   └── package.json                 # NPM dependencies
-│
-├── data/                             # Data files
-│   ├── videos/
-│   │   ├── parking.mp4              # Parking slot video
-│   │   └── plate.mp4                # Vehicle plate video
-│   ├── masks/
-│   │   ├── mask.png                 # Parking layout mask
-│   │   └── mask_crop.png            # Alternative mask
-│   └── models/
-│       ├── weights/model.p          # ML model for slot classification
-│       └── yolov8n.pt               # YOLO model for vehicle detection
-│
-├── easyocr_models/                   # EasyOCR language models (auto-downloaded)
-├── venv/                             # Python virtual environment
-├── parking.py                        # Parking detection logic
-├── plate.py                          # License plate recognition logic
-└── README.md                         # This file
+The repository combines three practical layers:
+
+1. Parking-slot detection using a segmentation mask and a trained occupancy classifier.
+2. Vehicle and license-plate ingestion using the existing ANPR workflow.
+3. A backend-ready data and recommendation layer that exposes current slot counts, recent vehicles, and the best available slot.
+
+The original parking and ANPR logic has been preserved and wrapped in a cleaner package structure so the code is easier to run, review, and extend.
+
+## Architecture Diagram
+
+```text
+parking.mp4 + mask.png
+        |
+        v
++---------------------------+
+| Parking Vision Agent      |
+| - detect slots from mask  |
+| - classify occupancy      |
++-------------+-------------+
+              |
+              v
+        +-----------+          plate.mp4 / ANPR runtime
+        | SQLite DB |<------------------------------+
+        +-----+-----+                               |
+              |                                     v
+              |                           +----------------------+
+              |                           | Plate / Vehicle Flow |
+              |                           | - plate detection    |
+              |                           | - OCR / ingestion    |
+              |                           +----------+-----------+
+              |                                      |
+              v                                      |
+    +---------------------+                          |
+    | Decision Planner    |--------------------------+
+    | - availability      |
+    | - nearest slot      |
+    | - directions        |
+    +----------+----------+
+               |
+               v
+    +----------------------+
+    | API + Frontend Layer |
+    +----------------------+
 ```
 
-## 🚀 Quick Start
+## Screenshots
 
-### Prerequisites
+### Parking Occupancy Detection
+
+![Parking occupancy detection](docs/images/parking-overview.jpeg)
+
+### Dashboard Overview
+
+![Dashboard overview](docs/images/dashboard-overview.jpeg)
+
+### Number Plate Detection
+
+![Number plate detection](docs/images/plate-detection.jpeg)
+
+### Vehicle Monitoring Panel
+
+![Vehicle monitoring panel](docs/images/dashboard-vehicles.jpeg)
+
+## Key Features
+
+- Real-time parking slot occupancy detection from video and mask assets.
+- License plate ingestion workflow for recent vehicle history.
+- SQLite-backed storage for slots and vehicles.
+- Slot recommendation with simple route guidance.
+- FastAPI backend routes for dashboard integration.
+- Lightweight `python main.py` demo that works without running the full live stack.
+
+## Tech Stack
+
 - Python 3.11+
-- Node.js 16+
-- Available ports: 8000 (backend), 3000 (frontend)
+- OpenCV
+- NumPy
+- scikit-learn compatible pickled classifier
+- YOLO / Ultralytics
+- EasyOCR
+- FastAPI
+- SQLAlchemy
+- React frontend dashboard
 
-### Installation
+## Project Workflow
 
-**Step 1: Install Backend Dependencies**
+### 1. Classification Layer
+
+The parking pipeline loads `data/masks/mask.png`, extracts slot regions, and classifies each slot as empty or occupied using the existing trained model in `data/models/weights/model.p`.
+
+### 2. Feature Importance (LIME)
+
+This repository does not currently implement LIME. The new structure keeps that future work isolated so an explainability layer can be added later without rewriting the current pipeline.
+
+### 3. Graph Correlation Layer
+
+A full graph-correlation model is not part of the current codebase. The `src/fusion/` package is included as the clean extension point for future research logic.
+
+### 4. Risk Fusion
+
+The current implementation performs lightweight result fusion by combining parking counts, the latest vehicle record, and the recommended slot into one runtime snapshot for demos and APIs.
+
+### 5. LLM Reasoning
+
+There is no LLM reasoning in the current project. The `src/reasoning/` package provides a safe place for human-readable summaries today and can evolve into richer reasoning later.
+
+### 6. Decision Planner
+
+The decision layer selects the best available slot based on location and returns route-style directions from the parking entrance to the recommended slot.
+
+## How It Is Different from Existing Systems
+
+- Combines parking occupancy and vehicle/plate records in one repository.
+- Ships with both a live-oriented stack and a lightweight demo entry point.
+- Separates core logic, persistence, API, and orchestration for easier maintenance.
+- Preserves the original implementation while making extension points explicit for research or viva discussions.
+
+## Installation
 
 ```bash
-cd backend
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**Step 2: Start Backend Server**
-
-```bash
-cd backend
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The backend will:
-- Initialize SQLite database
-- Start parking detection service (monitors parking.mp4)
-- Start plate detection service (monitors plate.mp4)
-- Expose REST API on `http://localhost:8000`
-- Auto-generated docs on `http://localhost:8000/docs`
-
-**Step 3: Install Frontend Dependencies**
+Optional frontend setup:
 
 ```bash
 cd frontend
 npm install
 ```
 
-**Step 4: Start Frontend**
+## How to Run
+
+### Lightweight demo
 
 ```bash
+python main.py
+```
+
+This path performs a real parking-slot scan on sample data and stores a lightweight demo vehicle record so the repository can be demonstrated quickly on low-resource machines.
+
+### API backend
+
+```bash
+python scripts/run_api.py
+```
+
+Then open [http://localhost:8000/docs](http://localhost:8000/docs).
+
+### Original interactive parking detector
+
+```bash
+python scripts/run_parking_agent.py
+```
+
+### Original interactive plate detector
+
+```bash
+python scripts/run_plate_agent.py
+```
+
+### Frontend dashboard
+
+```bash
+cd frontend
 npm start
 ```
 
-The dashboard will open at `http://localhost:3000`
+## Sample Output Explanation
 
-## 📊 Features
+`python main.py` prints:
 
-### Dashboard
-- **Real-time Statistics**: Total slots, available, occupied, efficiency percentage
-- **Parking Grid**: Color-coded display (🟢 available, 🔴 occupied)
-- **Parking Layout**: Visual representation using mask image
-- **Vehicle Detections**: Recently detected vehicles with license plates
-- **Auto-refresh**: Updates every 3 seconds
+- Total detected parking slots
+- Number of available vs occupied slots
+- Recommended slot label
+- Latest stored vehicle plate
+- Text directions to the recommended slot
 
-### Backend Services
+## Folder Structure
 
-**Parking Detector Service**
-- Continuously processes parking.mp4
-- Uses ML classifier to detect empty/occupied slots
-- Auto-rewinds video when finished
-- Stores results in SQLite database
-- Runs in background thread
-
-**Plate Detector Service**
-- Continuously processes plate.mp4  
-- Uses YOLOv8 to detect vehicles
-- Extracts license plate text using EasyOCR
-- Stabilizes detection with history buffers
-- Runs in background thread
-
-### REST API Endpoints
-
-```
-GET /parking/slots              - All slots with occupancy status
-GET /parking/slots/available    - Available slots only
-GET /parking/vehicles           - Recently detected vehicles
-GET /parking/mask-info          - Parking layout dimensions
-GET /parking/stats              - Parking statistics
-GET /health                     - System health check
-GET /docs                       - Swagger API documentation
+```text
+project-root/
+├── src/
+│   ├── agents/        # Parking, plate, orchestration, CLI response helpers
+│   ├── api/           # FastAPI application and routes
+│   ├── models/        # Database entities and model wrappers
+│   ├── fusion/        # Runtime result fusion helpers
+│   ├── reasoning/     # Human-readable explanation layer
+│   ├── decision/      # Slot recommendation logic
+│   └── utils/         # Paths, config, data manager
+├── configs/           # Project configuration
+├── data/              # Videos, masks, model assets, sample-data notes
+├── notebooks/         # Experiment space
+├── tests/             # Basic unit tests
+├── scripts/           # API and compatibility run scripts
+├── frontend/          # React dashboard
+├── requirements.txt
+├── .gitignore
+├── README.md
+├── LICENSE
+└── main.py
 ```
 
-## 🔧 Data Flow
+## Future Improvements
 
-```
-┌─────────────────┐
-│  parking.mp4    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────┐      ┌──────────────────┐
-│  Parking Detection      │─────>│  SQLite Database │
-│  (parking.py)           │      │  (parking.db)    │
-└────────┬────────────────┘      └└─┬────────────────┘
-         │                           │
-         │                           ▼
-         │                    ┌──────────────────┐
-         │                    │  FastAPI Backend │
-         │                    │  -  REST API     │
-         │                    │  -  Data Access  │
-         │                    └────────┬─────────┘
-         │                             │
-         └─────────────────────────────┤
-                                       │
-         ┌─────────────────┐           ▼
-         │   plate.mp4     │    ┌──────────────────┐
-         └────────┬────────┘    │  React Frontend  │
-                  │             │  -  Dashboard    │
-                  ▼             │  -  Polling (3s) │
-         ┌─────────────────────┐└──────────────────┘
-         │  Plate Detection   │
-         │  (plate.py)        │
-         └────────────────────┘
-```
+- Replace the demo stub vehicle with a true one-frame ANPR inference path in `main.py`.
+- Add model/config validation and richer logging.
+- Move the ANPR notebook into `notebooks/` with a documented experiment report.
+- Add CI checks, formatting, and automated tests for API routes.
+- Introduce optional explainability and more advanced route scoring.
 
-## 💾 Database Schema
+## Contributors
 
-**parking_slots table**
-```sql
-CREATE TABLE parking_slots (
-    id INTEGER PRIMARY KEY,
-    label TEXT UNIQUE,           -- e.g., "P1-S1"
-    x INTEGER,                   -- X coordinate
-    y INTEGER,                   -- Y coordinate
-    w INTEGER,                   -- Width
-    h INTEGER,                   -- Height
-    is_occupied BOOLEAN,         -- True if occupied
-    slot_mask BLOB,              -- Binary mask data
-    updated_at DATETIME          -- Last update timestamp
-);
-```
-
-**vehicles table**
-```sql
-CREATE TABLE vehicles (
-    id INTEGER PRIMARY KEY,
-    plate_text TEXT,             -- License plate number
-    vehicle_x1 INTEGER,          -- Vehicle bbox X1
-    vehicle_y1 INTEGER,          -- Vehicle bbox Y1
-    vehicle_x2 INTEGER,          -- Vehicle bbox X2
-    vehicle_y2 INTEGER,          -- Vehicle bbox Y2
-    plate_x1 INTEGER,            -- Plate bbox X1
-    plate_y1 INTEGER,            -- Plate bbox Y1
-    plate_x2 INTEGER,            -- Plate bbox X2
-    plate_y2 INTEGER,            -- Plate bbox Y2
-    detected_at DATETIME         -- Detection timestamp
-);
-```
-
-## 🔄 Real-time Updates
-
-The frontend polls the backend every 3 seconds to fetch:
-1. Parking slots status
-2. Parking statistics
-3. Recently detected vehicles
-4. Mask information
-
-## 📝 Configuration
-
-### Backend Configuration
-- **Database**: SQLite (parking.db) in project root
-- **Video Sources**: 
-  - Parking video: `data/videos/parking.mp4`
-  - Plate video: `data/videos/plate.mp4`
-- **ML Models**:
-  - Parking classifier: `data/models/weights/model.p`
-  - YOLO model: `data/models/yolov8n.pt`
-- **Mask Image**: `data/masks/mask.png` or `data/masks/mask_crop.png`
-
-### Frontend Configuration
-- **API URL**: `http://localhost:8000` (hardcoded, edit Dashboard.js to change)
-- **Poll Interval**: 3 seconds (edit Dashboard.js to change)
-
-## 🐛 Troubleshooting
-
-### Backend won't start
-- Check: All dependencies installed (`pip install -r backend/requirements.txt`)
-- Check: Video files exist in `data/videos/`
-- Check: Model files exist in `data/models/`
-- Check: Port 8000 is available
-- View: Backend logs in terminal
-
-### Frontend can't connect
-- Check: Backend is running on `http://localhost:8000`
-- Check: CORS is enabled (it is by default)
-- Check: Port 3000 is available
-
-### No data showing
-- Check: `parking.mp4` and `plate.mp4` are valid video files
-- Check: Database is being populated (check `parking.db`)
-- Check: Backend services are running (check terminal logs)
-
-### Database issues
-- Reset: `rm parking.db` (recreated on first run)
-- View: `sqlite3 parking.db` to query directly
-
-## 📚 API Usage Examples
-
-### Get all parking slots
-```bash
-curl http://localhost:8000/parking/slots
-```
-
-### Get available slots only
-```bash
-curl http://localhost:8000/parking/slots/available
-```
-
-### Get detected vehicles
-```bash
-curl http://localhost:8000/parking/vehicles
-```
-
-### Get mask info
-```bash
-curl http://localhost:8000/parking/mask-info
-```
-
-### View API documentation
-Open browser: `http://localhost:8000/docs`
-
-## 🎓 Key Technologies
-
-- **Backend**:
-  - FastAPI: Modern async web framework
-  - SQLAlchemy: ORM for database
-  - OpenCV: Computer vision processing
-  - Ultralytics YOLO: Vehicle detection
-  - EasyOCR: License plate OCR
-
-- **Frontend**:
-  - React 18: UI framework
-  - Axios: HTTP client for API calls
-  - Canvas API: Parking layout visualization
-
-## 📈 Performance
-
-- Parking detection: ~25ms per frame (auto-rewinds video)
-- Plate detection: ~40ms per frame with YOLO + OCR
-- Frontend polling: 3-second interval (configurable)
-- Database: SQLite (suitable for single-instance, ~10K slots)
-
-## 🔐 Security Notes
-
-- Backend CORS is enabled for localhost (configure for production)
-- No authentication implemented (add before production deployment)
-- Database is SQLite (upgrade to PostgreSQL for production)
-- API has no rate limiting (implement before production)
-
-## 📞 Support & Issues
-
-Common issues and solutions are documented in this README. For additional help:
-1. Check backend terminal output for errors
-2. Check browser console (F12) for frontend errors
-3. Verify file paths and dependencies
-4. Check database: `sqlite3 parking.db "SELECT COUNT(*) FROM parking_slots;"`
-
-## 📄 License
-
-This project is part of the Machine Vision Project.
-
-## 🎉 Next Steps
-
-To get started:
-1. Run backend: `python -m uvicorn backend.main:app --reload`
-2. Run frontend: `npm start` (from frontend dir)
-3. Visit: `http://localhost:3000`
-4. View API docs: `http://localhost:8000/docs`
-
-Enjoy your smart parking system! 🅿️
+- Your Name Here
+- Contributor 2

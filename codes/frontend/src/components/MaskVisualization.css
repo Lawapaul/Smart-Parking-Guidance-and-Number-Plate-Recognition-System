@@ -1,0 +1,28 @@
+.mask-visualization {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #2a3f5f 0%, #1a1a2e 100%);
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 300px;
+}
+
+.mask-canvas {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .mask-visualization {
+    padding: 15px;
+    min-height: 200px;
+  }
+
+  .mask-canvas {
+    max-height: 300px;
+  }
+}
