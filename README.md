@@ -220,7 +220,3 @@ project-root/
 - Add CI checks, formatting, and automated tests for API routes.
 - Introduce optional explainability and more advanced route scoring.
 
-## Contributors
-
-- Your Name Here
-- Contributor 2
